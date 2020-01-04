@@ -13,9 +13,26 @@
 
 ;;; actually this is something we should absoloutley look into
 
-(defun room-members (account room-id)
-  (jsown:val (cl-matrix.api.client:get-rooms/roomid/members account room-id)
-             "joined"))
+(defun room-members (account room-id &key at membership not-membership)
+  "Get the JSON for the room members list.
+
+AT is the point in time (pagination token) to return members for in the room.
+
+MEMBERSHIP is the kind of membership to filter for. Defaults to no filtering if unspecified. It can be one of: join, invite, leave, ban.
+
+NOT-MEMBERSHIP is the kind of membership to exclude from the results. Defaults to no filtering if unspecified.
+
+See https://matrix.org/docs/spec/client_server/r0.6.0#id259"
+  (jsown:val (cl-matrix.api.client:get-rooms/roomid/members
+              account room-id
+              :parameters (append
+                           (when at
+                             (list (cons "at" at)))
+                           (when membership
+                             (list (cons "membership" membership)))
+                           (when not-membership
+                             (list (cons "not_membership" not-membership)))))
+             "chunk"))
 
 (defun joined-rooms (account)
   (jsown:val (cl-matrix.api.client:get-joined-rooms account)
