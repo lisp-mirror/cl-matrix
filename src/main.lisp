@@ -95,11 +95,11 @@ Returns the room-id for the created room."
   (post-rooms/roomid/invite account room-id
                             (jsown:to-json `(:obj ("user_id" . ,user-id)))))
 
-(defun sync (account &key since filter)
+(defun sync (account &key since filter timeout set-presence full-state)
   "see the spec, read 8.2 syncing to understand how this works."
   (let ((response (get-sync account
                             :parameters
-                            (alist-without-nulls since filter))))
+                            (alist-without-nulls since filter timeout set-presence full-state))))
     (values response (jsown:val response "next_batch"))))
 
 (defun invitations (account &key since (from nil from-p))
